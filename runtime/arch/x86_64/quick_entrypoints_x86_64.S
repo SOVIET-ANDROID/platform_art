@@ -736,7 +736,7 @@ MACRO3(ONE_ARG_SAVE_EVERYTHING_DOWNCALL, c_name, cxx_name, runtime_method_offset
     CFI_REMEMBER_STATE
     RESTORE_SAVE_EVERYTHING_FRAME_KEEP_RAX        // restore frame up to return address
     ret
-    CFI_RESTORE_STATE_AND_DEF_CFA(rsp, FRAME_SIZE_SAVE_EVERYTHING)
+    CFI_RESTORE_STATE_AND_DEF_CFA rsp, FRAME_SIZE_SAVE_EVERYTHING
 1:
     DELIVER_PENDING_EXCEPTION_FRAME_READY
     END_FUNCTION VAR(c_name)
@@ -1187,7 +1187,7 @@ DEFINE_FUNCTION art_quick_check_instance_of
     addq LITERAL(24), %rsp            // pop arguments
     CFI_ADJUST_CFA_OFFSET(-24)
     ret
-    CFI_RESTORE_STATE_AND_DEF_CFA(rsp, 64)  // Reset unwind info so following code unwinds.
+    CFI_RESTORE_STATE_AND_DEF_CFA rsp, 64  // Reset unwind info so following code unwinds.
 
 .Lthrow_class_cast_exception:
     RESTORE_FP_CALLEE_SAVE_FRAME
@@ -1449,7 +1449,7 @@ DEFINE_FUNCTION art_quick_imt_conflict_trampoline
     CFI_REMEMBER_STATE
     POP rdx
     jmp *ART_METHOD_QUICK_CODE_OFFSET_64(%rdi)
-    CFI_RESTORE_STATE_AND_DEF_CFA(rsp, 16)
+    CFI_RESTORE_STATE_AND_DEF_CFA rsp, 16
 .Limt_table_next_entry:
     // If the entry is null, the interface method is not in the ImtConflictTable.
     cmpq LITERAL(0), 0(%rdi)
@@ -1464,7 +1464,7 @@ DEFINE_FUNCTION art_quick_imt_conflict_trampoline
     POP rdx
     movq %rax, %rdi  // Load interface method
     INVOKE_TRAMPOLINE_BODY artInvokeInterfaceTrampoline
-    CFI_RESTORE_STATE_AND_DEF_CFA(rsp, 16)
+    CFI_RESTORE_STATE_AND_DEF_CFA rsp, 16
 .Limt_conflict_trampoline_dex_cache_miss:
     // We're not creating a proper runtime method frame here,
     // artLookupResolvedMethod() is not allowed to walk the stack.
@@ -1740,7 +1740,7 @@ DEFINE_FUNCTION art_quick_generic_jni_trampoline
     ret
 
     // Undo the unwinding information from above since it doesn't apply below.
-    CFI_RESTORE_STATE_AND_DEF_CFA(rbp, 208)
+    CFI_RESTORE_STATE_AND_DEF_CFA rbp, 208
 .Lexception_in_native:
     pushq %gs:THREAD_TOP_QUICK_FRAME_OFFSET
     addq LITERAL(-1), (%rsp)  // Remove the GenericJNI tag.
@@ -2178,7 +2178,7 @@ DEFINE_FUNCTION art_quick_osr_stub
     movq %rax, (%rcx)              // Store the result.
     ret
 .Losr_entry:
-    CFI_RESTORE_STATE_AND_DEF_CFA(rsp, 80)
+    CFI_RESTORE_STATE_AND_DEF_CFA rsp, 80
     // Since the call has pushed the return address we need to switch the CFA register to RBP.
     CFI_DEF_CFA_REGISTER(rbp)
 
